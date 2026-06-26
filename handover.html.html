@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSI WC Weekly Handover Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tangerine:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --purple:#534AB7;--purple-l:#EEEDFE;--purple-m:#AFA9EC;--purple-d:#3C3489;
+  --teal:#0F6E56;--teal-l:#E1F5EE;--teal-m:#5DCAA5;
+  --amber:#854F0B;--amber-l:#FAEEDA;--amber-m:#EF9F27;
+  --coral:#993C1D;--coral-l:#FAECE7;--coral-m:#F0997B;
+  --blue:#185FA5;--blue-l:#E6F1FB;--blue-m:#85B7EB;
+  --pink:#993556;--pink-l:#FBEAF0;--pink-m:#ED93B1;
+  --green:#2E7D32;--green-l:#EAF3DE;--green-m:#97C459;
+  --text:#1a1a1a;--text-sec:#5a5a5a;--text-hint:#999;
+  --border:#e0e0e0;--bg:#f4f4f2;--surface:#fff;
+  --radius:10px;--radius-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+.page{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+
+/* HEADER */
+.hdr{background:var(--purple);border-radius:var(--radius);padding:18px 24px 16px;margin-bottom:14px}
+.hdr-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.hdr-top h1{color:#fff;font-size:19px;font-weight:700;flex:1;line-height:1.2}
+.hdr-sub{color:#AFA9EC;font-size:11px;margin-top:3px}
+.hdr-saved{font-size:11px;color:#AFA9EC;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.hdr-fields{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hdr-input{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:var(--radius-sm);padding:7px 12px;color:#fff;font-size:13px;font-family:inherit;outline:none}
+.hdr-input::placeholder{color:rgba(255,255,255,0.5)}
+.hdr-input[type=date]{width:165px;color-scheme:dark}
+.hdr-input.name{width:190px}
+.hdr-lbl{font-size:11px;color:rgba(255,255,255,0.55);margin-right:-4px}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.exp-btn{font-size:13px;color:var(--text-sec);cursor:pointer;background:none;border:none;font-family:inherit;display:flex;align-items:center;gap:5px;padding:4px 0}
+
+/* SECTIONS */
+.sec{border-radius:var(--radius);margin-bottom:8px;border:1px solid transparent;overflow:hidden}
+.sec-hdr{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;user-select:none}
+.num-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#fff}
+.sec-title{font-size:14px;font-weight:600;flex:1}
+.sec-tag{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;white-space:nowrap}
+.chev{font-size:16px;color:var(--text-hint);transition:transform .2s;flex-shrink:0}
+.chev.open{transform:rotate(180deg)}
+.sec-body{display:none;padding:4px 16px 16px}
+.sec-body.open{display:block}
+
+/* FIELDS */
+.field{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.f-label{font-size:12px;font-weight:600;min-width:115px;padding-top:9px;color:var(--text-sec);flex-shrink:0}
+.f-input,.f-textarea{flex:1;border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 11px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;transition:border-color .15s}
+.f-input[type=date]{color-scheme:light}
+.f-textarea{resize:vertical;min-height:58px;line-height:1.5}
+.num-input{width:76px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:16px;font-weight:600;text-align:center;font-family:inherit;background:var(--surface);color:var(--text);outline:none}
+.num-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.num-label{font-size:13px;color:var(--text-sec)}
+
+/* ATTACHMENTS */
+.att-wrap{margin-top:8px}
+.att-zone{border:1.5px dashed var(--border);border-radius:var(--radius-sm);padding:9px 14px;cursor:pointer;transition:border-color .15s,background .15s;background:rgba(255,255,255,0.6)}
+.att-zone:hover,.att-zone.drag{border-color:var(--purple);background:rgba(83,74,183,0.04)}
+.att-zone-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-sec)}
+.att-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:12px;background:var(--surface);border:1px solid var(--border);color:var(--text-sec)}
+.chip .rm{cursor:pointer;color:var(--text-hint);font-size:16px;line-height:1;margin-left:2px}
+.chip .rm:hover{color:#c0392b}
+
+/* SNIP */
+.snip-preview{display:none;margin-top:8px;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);max-height:200px;position:relative}
+.snip-preview img{width:100%;display:block;object-fit:contain;max-height:200px;background:#f5f5f5}
+.snip-rm{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);color:#fff;border:none;border-radius:4px;padding:3px 8px;font-size:12px;cursor:pointer}
+
+/* LINK PREVIEW */
+.link-preview{display:none;align-items:center;gap:8px;margin-top:6px;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px}
+.link-preview i{font-size:15px;color:var(--blue)}
+.link-preview a{color:var(--blue);text-decoration:none;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.link-preview a:hover{text-decoration:underline}
+.link-ok{color:var(--green);font-weight:600;white-space:nowrap}
+
+/* STATUS PILLS */
+.pill-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.pill{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer;background:var(--surface);color:var(--text-sec);font-family:inherit;transition:all .15s}
+.pill.ok{background:#EAF3DE;border-color:#97C459;color:#3B6D11}
+.pill.mon{background:#FAEEDA;border-color:#EF9F27;color:#854F0B}
+.pill.act{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}
+
+/* ACTION ITEMS */
+.ai-table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:13px}
+.ai-table th{font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.4px;padding:6px 8px;background:#EAF3DE;text-align:left}
+.ai-table td{padding:6px;border-bottom:1px solid #e8f5e0;vertical-align:middle}
+.ai-table tr:nth-child(even) td{background:rgba(234,243,222,0.4)}
+.ai-inp{width:100%;border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);outline:none}
+.ai-tag{width:100%;border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);outline:none}
+.ai-tag::placeholder{color:var(--text-hint)}
+.ai-sel{border:1px solid var(--border);border-radius:4px;padding:5px 6px;font-size:12px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;cursor:pointer;width:100%}
+.ai-sel.p-high{background:#FCEBEB;color:#A32D2D;border-color:#E24B4A;font-weight:600}
+.ai-sel.p-med{background:#FAEEDA;color:#854F0B;border-color:#EF9F27;font-weight:600}
+.ai-sel.p-low{background:#EAF3DE;color:#2E7D32;border-color:#97C459;font-weight:600}
+.ai-done-wrap{display:flex;justify-content:center;align-items:center}
+.ai-cb{width:18px;height:18px;cursor:pointer;accent-color:var(--green)}
+.ai-row.done td{opacity:.5}
+.ai-row.done .ai-inp{text-decoration:line-through;color:var(--text-hint)}
+.rm-row{background:none;border:none;cursor:pointer;color:var(--text-hint);font-size:18px;padding:2px 4px;border-radius:4px}
+.rm-row:hover{color:#c0392b;background:#FCEBEB}
+.add-row-btn{display:inline-flex;align-items:center;gap:6px;border:1.5px dashed var(--green-m);border-radius:var(--radius-sm);padding:7px 14px;font-size:13px;font-family:inherit;color:var(--green);background:rgba(234,243,222,0.4);cursor:pointer;font-weight:500;transition:all .15s}
+.add-row-btn:hover{background:var(--green-l)}
+.ai-count{display:inline-flex;align-items:center;justify-content:center;background:var(--green);color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:700;margin-left:6px}
+
+/* ══ DASHBOARD CANVAS (2.2:1 render target) ══ */
+/* This is what gets captured as the image — hidden from page flow */
+#dashCanvas{
+  position:fixed;top:-9999px;left:-9999px;
+  width:800px;height:360px;
+  background:linear-gradient(145deg,#1a1445 0%,#2d2460 50%,#1e3a5f 100%);
+  padding:10px 22px 20px;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  color:#fff;
+  overflow:hidden;
+  border-radius:0;
+}
+/* dashboard preview (visible, smaller) */
+#dashPreview{
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:14px;
+  background:linear-gradient(135deg,#1a1445 0%,#2d2460 50%,#1e3a5f 100%);
+  color:#fff;
+  position:relative;
+}
+
+/* shared dash styles (used in both preview and canvas) */
+.d-title{font-weight:800;letter-spacing:-0.5px;line-height:1}
+.d-subtitle{opacity:.6;font-weight:400}
+.d-week{opacity:.7;font-weight:500}
+
+/* number strip */
+.d-nums{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.d-num{border-radius:12px;text-align:center;padding:16px 8px 14px;border:2px solid rgba(255,255,255,0.15)}
+.d-num-label{font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.8}
+.d-num-val{font-weight:900;line-height:1;letter-spacing:-2px}
+.d-num-sub{opacity:.55;margin-top:4px}
+
+/* solid section colours */
+.dn-purple{background:#534AB7;border-color:#AFA9EC}
+.dn-teal  {background:#0F6E56;border-color:#5DCAA5}
+.dn-teal2 {background:#085041;border-color:#3DA882}
+.dn-amber {background:#7A4500;border-color:#EF9F27}
+.dn-coral {background:#8B2E10;border-color:#F0997B}
+
+/* info row */
+.d-info{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.d-box{border-radius:10px;padding:14px 16px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.07)}
+.d-box-label{font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.55}
+.d-box-val{font-weight:600;color:#fff}
+
+/* highlights full width */
+.d-highlight{border-radius:10px;padding:14px 18px;border:1.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05)}
+
+/* action checklist in dash */
+.d-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.d-action-item{display:flex;align-items:center;gap:10px;border-radius:8px;padding:10px 14px;border:1.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06)}
+.d-action-tick{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.d-action-tick.open{background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5)}
+.d-action-tick.done{background:#2E7D32;color:#fff}
+.d-action-text{font-size:13px;flex:1}
+.d-action-text.done-text{text-decoration:line-through;opacity:.5}
+.d-action-pri{font-size:11px;opacity:.7;white-space:nowrap}
+
+/* links row */
+.d-links{display:flex;gap:14px;flex-wrap:wrap}
+.d-link-pill{display:inline-flex;align-items:center;gap:7px;border-radius:20px;padding:8px 18px;font-weight:600;border:2px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff}
+
+/* status badges */
+.d-status-ok {background:rgba(46,125,50,0.35);border:2px solid #97C459;color:#c5e89a;border-radius:20px;padding:4px 14px;font-weight:700;display:inline-flex;align-items:center;gap:5px}
+.d-status-mon{background:rgba(133,79,11,0.35);border:2px solid #EF9F27;color:#fcd08a;border-radius:20px;padding:4px 14px;font-weight:700;display:inline-flex;align-items:center;gap:5px}
+.d-status-act{background:rgba(153,45,45,0.35);border:2px solid #E24B4A;color:#f5a5a5;border-radius:20px;padding:4px 14px;font-weight:700;display:inline-flex;align-items:center;gap:5px}
+.d-status-none{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);border-radius:20px;padding:4px 14px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+
+/* PREVIEW PANEL (on-page, scaled down) */
+#dashPreview .prev-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px}
+#dashPreview .prev-title{font-size:18px;font-weight:800}
+#dashPreview .prev-sub{font-size:12px;opacity:.6;margin-top:3px}
+#dashPreview .prev-week{font-size:13px;opacity:.65;text-align:right;padding-top:4px}
+#dashPreview .prev-nums{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+#dashPreview .pn{border-radius:10px;text-align:center;padding:12px 6px 10px;border:2px solid rgba(255,255,255,0.18)}
+#dashPreview .pn-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.8;margin-bottom:4px}
+#dashPreview .pn-val{font-size:26px;font-weight:900;line-height:1}
+#dashPreview .pn-sub{font-size:9px;opacity:.5;margin-top:2px}
+#dashPreview .prev-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+#dashPreview .pb{border-radius:8px;padding:10px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1)}
+#dashPreview .pb-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px}
+#dashPreview .pb-val{font-size:12px;font-weight:600;color:#fff}
+#dashPreview .prev-hi{border-radius:8px;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);margin-bottom:10px}
+#dashPreview .prev-hi-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px}
+#dashPreview .prev-hi-val{font-size:12px;color:#fff;opacity:.8}
+#dashPreview .prev-acts{margin-bottom:10px}
+#dashPreview .prev-act-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:6px}
+#dashPreview .prev-act-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);margin-bottom:4px;font-size:11px}
+#dashPreview .prev-act-tick{width:16px;height:16px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+#dashPreview .prev-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+#dashPreview .prev-link{display:inline-flex;align-items:center;gap:5px;border-radius:16px;padding:5px 12px;font-size:11px;font-weight:600;border:1.5px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;text-decoration:none}
+#dashPreview .prev-link:hover{background:rgba(255,255,255,0.2)}
+
+/* DASH BUTTONS */
+.dash-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.dash-btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;font-family:inherit;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.dash-btn:active{transform:scale(.98)}
+.dbtn-refresh{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2)}
+.dbtn-refresh:hover{background:rgba(255,255,255,0.22)}
+.dbtn-snap{background:var(--amber-m);color:#fff}
+.dbtn-snap:hover{background:#d4891a}
+.dbtn-checklist{background:var(--green);color:#fff}
+.dbtn-checklist:hover{background:#1B5E20}
+.dbtn-copy{background:var(--purple);color:#fff}
+.dbtn-copy:hover{background:var(--purple-d)}
+.snap-note{font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;display:none}
+.snap-note.show{display:block}
+
+/* BOTTOM BAR */
+.bottom{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.btn{display:inline-flex;align-items:center;gap:7px;border-radius:var(--radius-sm);padding:9px 18px;font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;transition:all .15s;border:none}
+.btn:active{transform:scale(.98)}
+.btn-teams{background:var(--purple);color:#fff}.btn-teams:hover{background:var(--purple-d)}
+.btn-pdf{background:#C0392B;color:#fff}.btn-pdf:hover{background:#96281B}
+.btn-print{background:var(--blue);color:#fff}.btn-print:hover{background:#0d4a87}
+.btn-reset{background:var(--surface);color:var(--text-sec);border:1px solid var(--border)}.btn-reset:hover{background:var(--bg)}
+.hint{font-size:11px;color:var(--text-hint);line-height:1.4}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);border-radius:var(--radius-sm);padding:10px 20px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap;z-index:9999}
+.toast.show{opacity:1}
+.toast.green{background:#2E7D32;color:#EAF3DE}
+.toast.blue{background:#185FA5;color:#E6F1FB}
+.toast.amber{background:#854F0B;color:#FAEEDA}
+.toast.red{background:#A32D2D;color:#FCEBEB}
+
+.sp-note{background:var(--blue-l);border:1px solid var(--blue-m);border-radius:var(--radius-sm);padding:9px 14px;font-size:12px;color:var(--blue);margin-bottom:12px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+
+@media print{
+  body{background:#fff}
+  .page{padding:0;max-width:100%}
+  .sp-note,.toolbar,.bottom,.toast,#dashPreview,#dashCanvas{display:none!important}
+  .sec{break-inside:avoid;margin-bottom:5px;border:1px solid #ddd!important}
+  .sec-body{display:block!important}
+  .chev,.att-zone,.add-row-btn,.rm-row{display:none}
+  .hdr{background:var(--purple)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .num-badge{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media(max-width:600px){
+  #dashPreview .prev-nums{grid-template-columns:repeat(3,1fr)}
+  #dashPreview .prev-row{grid-template-columns:1fr 1fr}
+  .sec-tag{display:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="sp-note">
+  <i class="ti ti-info-circle" style="font-size:16px;flex-shrink:0;margin-top:1px"></i>
+  <span><strong>SharePoint:</strong> Add as a Teams tab or paste into an Embed web part. Data auto-saves in this browser.</span>
+</div>
+
+<!-- ══ DASHBOARD PREVIEW (visible on page) ══ -->
+<div id="dashPreview">
+  <div class="prev-header">
+    <div>
+      <div class="prev-title" id="pvTitle">CSI WC — </div>
+      <div class="prev-sub">Weekly Handover Dashboard</div>
+    </div>
+    <div class="prev-week" id="pvWeek">Week ending —</div>
+  </div>
+
+  <div class="prev-nums" id="pvNums">
+    <div class="pn dn-purple"><div class="pn-lbl">📬 CSI Queue</div><div class="pn-val" id="pv1">—</div><div class="pn-sub">after Direct</div></div>
+    <div class="pn dn-teal"> <div class="pn-lbl">📋 Tracker</div>  <div class="pn-val" id="pv2">—</div><div class="pn-sub">remaining</div></div>
+    <div class="pn dn-teal2"><div class="pn-lbl">⚠️ Overdue</div><div class="pn-val" id="pv2b">—</div><div class="pn-sub">disputes</div></div>
+    <div class="pn dn-amber"><div class="pn-lbl">📥 Inbox</div>    <div class="pn-val" id="pv3">—</div><div class="pn-sub">remaining</div></div>
+    <div class="pn dn-coral"><div class="pn-lbl">📊 CSI Dash</div> <div class="pn-val" id="pv4">—</div><div class="pn-sub">pending</div></div>
+  </div>
+
+  <div class="prev-row">
+    <div class="pb"><div class="pb-lbl">🚦 Status</div><div id="pvStatus"><span class="d-status-none">Not set</span></div></div>
+    <div class="pb"><div class="pb-lbl">✅ Actions</div><div class="pb-val" id="pvAI">—</div></div>
+    <div class="pb"><div class="pb-lbl">🗓 WD Holds</div><div class="pb-val" id="pvHolds">—</div></div>
+    <div class="pb"><div class="pb-lbl">✅ WD Verify</div><div class="pb-val" id="pvVerify">—</div></div>
+  </div>
+
+  <div class="prev-hi">
+    <div class="prev-hi-lbl">🔦 Highlights / Concerns</div>
+    <div class="prev-hi-val" id="pvHighlight" style="font-style:italic;opacity:.45">Nothing flagged</div>
+  </div>
+
+  <div class="prev-acts">
+    <div class="prev-act-title">📌 Action Items</div>
+    <div id="pvActList"><div style="font-size:11px;opacity:.4;padding:4px 0">No action items yet</div></div>
+  </div>
+
+  <div class="prev-links">
+    <div class="prev-act-title" style="width:100%;margin-bottom:2px">🔗 Quick Links</div>
+    <a id="pvCsiLink" class="prev-link" href="#" target="_blank" rel="noopener" style="display:none"><i class="ti ti-table"></i> CSI Dash</a>
+    <a id="pvWdLink"  class="prev-link" href="#" target="_blank" rel="noopener" style="display:none"><i class="ti ti-leaf"></i> WD Dash</a>
+    <span id="pvNoLinks" style="font-size:11px;opacity:.35">No SharePoint links added yet</span>
+  </div>
+
+  <div class="dash-btns">
+    <button class="dash-btn dbtn-refresh"   onclick="generateDash()"><i class="ti ti-refresh"></i> Refresh</button>
+    <button class="dash-btn dbtn-snap"       onclick="snapDash()"><i class="ti ti-camera"></i> Save Dashboard as Image</button>
+    <button class="dash-btn dbtn-checklist" onclick="copyLoop()"><i class="ti ti-list-check"></i> Copy Loop Checklist</button>
+    <button class="dash-btn dbtn-copy"      onclick="copyDashboard()"><i class="ti ti-copy"></i> Copy Dashboard Text</button>
+  </div>
+  <div class="snap-note" id="snapNote"></div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<div class="hdr">
+  <div class="hdr-top">
+    <i class="ti ti-clipboard-list" style="color:#fff;font-size:22px;flex-shrink:0;margin-top:2px"></i>
+    <div style="flex:1"><h1>CSI WC Weekly Handover Report</h1><div class="hdr-sub">CSI Operations</div></div>
+    <div class="hdr-saved"><i class="ti ti-device-floppy"></i><span id="savedText">Not saved</span></div>
+  </div>
+  <div class="hdr-fields">
+    <span class="hdr-lbl">Week ending</span>
+    <input class="hdr-input" type="date" id="hdate" oninput="autoSave()">
+    <input class="hdr-input name" type="text" id="agent" placeholder="Your name" oninput="autoSave()">
+    <input class="hdr-input" type="text" id="agentDay" placeholder="Day (e.g. Mon)" style="max-width:110px" oninput="autoSave()">
+  </div>
+</div>
+
+<div class="toolbar">
+  <button class="exp-btn" onclick="toggleAll()" id="expBtn"><i class="ti ti-chevrons-down" id="expIcon"></i> Expand all sections</button>
+  <span style="font-size:11px;color:var(--text-hint)" id="todayHint"></span>
+</div>
+
+<!-- S0 DASHBOARD IMAGE -->
+<div class="sec" style="background:var(--purple-l);border-color:var(--purple-m)">
+  <div class="sec-hdr" onclick="tog(this)">
+    <div class="num-badge" style="background:var(--purple)"><i class="ti ti-photo" style="font-size:13px"></i></div>
+    <span class="sec-title" style="color:var(--purple-d)">Dashboard Image</span>
+    <span class="sec-tag" style="background:var(--purple-m);color:var(--purple-d)">For PDF Report</span>
+    <i class="ti ti-chevron-down chev open"></i>
+  </div>
+  <div class="sec-body open">
+    <div style="font-size:11px;color:var(--text-hint);margin-bottom:8px">💡 Click "Save Dashboard as Image" above, then click this box once and press Ctrl+V to paste — or drag &amp; drop / attach a file.</div>
+    <div class="att-wrap">
+      <div class="att-zone" id="dashImgZone" onclick="trigFile('dashImgFile')" ondragover="onDrag(event,this)" ondragleave="offDrag(this)" ondrop="onDropDashImg(event)" onpaste="onPasteDashImg(event)" tabindex="0">
+        <div class="att-zone-row"><i class="ti ti-screenshot" style="color:var(--purple)"></i><span>Attach or paste dashboard snapshot — click, drag &amp; drop, or Ctrl+V</span></div>
+      </div>
+      <input type="file" id="dashImgFile" accept="image/*" style="display:none" onchange="addDashImg(this)">
+      <div class="snip-preview" id="dashImgPreview" style="display:none"><img id="dashImgPreviewImg" src="" alt="Dashboard snapshot"><button class="snip-rm" onclick="removeDashImg()">✕ Remove</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- S1 CSI QUEUE -->
+<div class="sec" style="background:var(--purple-l);border-color:var(--purple-m)">
+  <div class="sec-hdr" onclick="tog(this)">
+    <div class="num-badge" style="background:var(--purple)">1</div>
+    <span class="sec-title" style="color:var(--purple-d)">CSI Queue</span>
+    <span class="sec-tag" style="background:var(--purple-m);color:var(--purple-d)">WC Queue</span>
+    <i class="ti ti-chevron-down chev"></i>
+  </div>
+  <div class="sec-body">
+    <div class="num-row"><input class="num-input" type="number" id="q1n" placeholder="0" min="0" oninput="autoSave()"><span class="num-label">remaining after Direct cleared</span></div>
+    <div class="field"><span class="f-label" style="color:var(--purple)">Notes</span><textarea class="f-textarea" id="q1notes" placeholder="Any blockers or context..." oninput="autoSave()"></textarea></div>
+    <div class="att-wrap">
+      <div class="att-zone" id="snipZone1" onclick="trigFile('f1')" ondragover="onDrag(event,this)" ondragleave="offDrag(this)" ondrop="onDropSnip(event)">
+        <div class="att-zone-row"><i class="ti ti-screenshot" style="color:var(--purple)"></i><span>Attach CSI Queue snip — click or drag &amp; drop</span></div>
+      </div>
+      <input type="file" id="f1" accept="image/*" style="display:none" onchange="addSnip(this)">
+      <div class="snip-preview" id="snipPreview"><img id="snipImg" src="" alt="CSI Queue snip"><button class="snip-rm" onclick="removeSnip()">✕ Remove</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- S2 CSI TRACKER -->
+<div class="sec" style="background:var(--teal-l);border-color:var(--teal-m)">
+  <div class="sec-hdr" onclick="tog(this)">
+    <div class="num-badge" style="background:var(--teal)">2</div>
+    <span class="sec-title" style="color:#085041">CSI Tracker</span>
+    <span class="sec-tag" style="background:var(--teal-m);color:#085041">Disputes &amp; Timeframes</span>
+    <i class="ti ti-chevron-down chev"></i>
+  </div>
+  <div class="sec-body">
+    <div class="num-row"><input class="num-input" type="number" id="q2n" placeholder="0" min="0" oninput="autoSave()"><span class="num-label">remaining on tracker</span></div>
+    <div class="num-row"><input class="num-input" type="number" id="q2outstanding" placeholder="0" min="0" oninput="autoSave()"><span class="num-label">outstanding disputes / over timeframe</span></div>
+    <div class="field"><span class="f-label" style="color:var(--teal)">⚠️ Details</span><textarea class="f-textarea" id="q2out" placeholder="Describe outstanding items..." oninput="autoSave()"></textarea></div>
+    <div class="att-wrap">
+      <div class="att-zone" onclick="trigFile('f2')" ondragover="onDrag(event,this)" ondragleave="offDrag(this)" ondrop="onDrop(event,'chips2',this)">
+        <div class="att-zone-row"><i class="ti ti-paperclip" style="color:var(--teal)"></i><span>Attach file</span></div>
+        <div class="att-chips" id="chips2"></div>
+      </div>
+      <input type="file" id="f2" multiple style="display:none" onchange="addFiles(this,'chips2')">
+    </div>
+  </div>
+</div>
+
+<!-- S3 CSI INBOX -->
+<div class="sec" style="background:var(--amber-l);border-color:var(--amber-m)">
+  <div class="sec-hdr" onclick="tog(this)">
+    <div class="num-badge" style="background:var(--amber)">3</div>
+    <span class="sec-title" style="color:#633806">CSI Inbox</span>
+    <span class="sec-tag" style="background:var(--amber-m);color:#633806">Escalations</span>
+    <i class="ti ti-chevron-down chev"></i>
+  </div>
+  <div class="sec-body">
+    <div class="num-row"><input class="num-input" type="number" id="q3n" placeholder="0" min="0" oninput="autoSave()"><span class="num-label">remaining in inbox</span></div>
+    <div class="field"><span class="f-label" style="color:var(--amber)">🏷️ Tag</span><textarea class="f-textarea" id="q3tls" placeholder="@Name — reason (CSR must speak to TL first)" oninput="autoSave()"></textarea></div>
+    <div class="field"><span class="f-label" style="color:var(--amber)">⚠️ Disputes</span><textarea class="f-textarea" id="q3disputes" placeholder="List active disputes..." oninput="autoSave()"></textarea></div>
+    <div class="att-wrap">
+      <div class="att-zone" onclick="trigFile('f3')" ondragover="onDrag(event,this)" ondragleave="offDrag(this)" ondrop="onDrop(event,'chips3',this)">
+        <div class="att-zone-row"><i class="ti ti-paperclip" style="color:var(--amber)"></i><span>Attach files</span></div>
+        <div class="att-chips" id="chips3"></div>
+      </div>
+      <input type="file" id="f3" multiple style="display:none" onchange="addFiles(this,'chips3')">
+    </div>
+  </div>
+</div>
+
+<!-- S4 CSI DASH -->
+<div class="sec" style="background:var(--coral-l);border-color:var(--coral-m)">
+  <div class="sec-hdr" onclick="tog(this)">
+    <div class="num-badge" style="background:var(--coral)">4</div>
+    <span class="sec-title" style="color:#4A1B0C">CSI Dash</span>
+    <span class="sec-tag" style="background:var(--coral-m);color:#4A1B0C">Visibility</span>
+    <i class="ti ti-chevron-down chev"></i>
+  </div>
+  <div class="sec-body">
+    <div class="num-row"><input class="num-input" type="number" id="q4pending" placeholder="0" min="0" oninput="autoSave()"><span class="num-label">pending items</span></div>
+    <div class="field"><span class="f-label" style="color:var(--coral)">📊 Summary</span><textarea class="f-textarea" id="q4sum" placeholder="Paste key metrics or dash summary..." oninput="autoSave()"></textarea></div>
+    <div class="field">
+      <span class="f-label" style="color:var(--coral)">🔗 SharePoint</span>
+      <div style="flex:1">
+        <input class="f-input" type="url" id="q4link" placeholder="Paste SharePoint link..." oninput="previewLink('q4link','q4preview');autoSave()">
+        <div id="q4preview" class="link-preview"><i class="ti ti-external-link"></i><a id="q4previewA" href="#" target="_blank" rel="noopener">Open CSI Dash</a><span class="link-ok">✓ Ready</span></div>
+      </div>
+    </div>
+    <div class="att-wrap">
+      <div class="att-zone" onclick="trigFile('f4')" ondragover="onDrag(event,this)" ondragleave="offDrag(this)" ondrop="onDrop(event,'chips4',this)">
+        <div class="att-zone-row"><i class="ti ti-screenshot" style="color:var(--coral)"></i><i class="ti ti-paperclip" style="color:var(--coral)"></i><span>Attach screenshot / file</span></div>
+        <div class="att-chips" id="chips4"></div>
+      </div>
+      <input type="file" id="f4" multiple style="display:none" onchange="addFiles(this,'chips4')">
+    </div>
+  </div>
+</div>
+
+<!-- S5 WD DASH -->
+<div class="sec" style="background:var(--blue-l);border-color:var(--blue-m)">
+  <div class="sec-hdr" onclick="tog(this)">
+    <div class="num-badge" style="background:var(--blue)">5</div>
+    <span class="sec-title" style="color:#042C53">Waste Digital Dash</span>
+    <span class="sec-tag" style="background:var(--blue-m);color:#042C53">Visibility</span>
+    <i class="ti ti-chevron-down chev"></i>
+  </div>
+  <div class="sec-body">
+    <div class="field"><span class="f-label" style="color:var(--blue)">📊 Summary</span><textarea class="f-textarea" id="q5sum" placeholder="Paste key metrics or dash summary..." oninput="autoSave()"></textarea></div>
+    <div class="field"><span class="f-label" style="color:var(--blue)">🗓 Holds cleared</span><input class="f-input" type="date" id="q5holds" oninput="autoSave()"></div>
+    <div class="field"><span class="f-label" style="color:var(--blue)">✅ Verification</span><input class="f-input" type="date" id="q5verify" oninput="autoSave()"></div>
+    <div class="field">
+      <span class="f-label" style="color:var(--blue)">🔗 SharePoint</span>
+      <div style="flex:1">
+        <input class="f-input" type="url" id="q5link" placeholder="Paste SharePoint link..." oninput="previewLink('q5link','q5preview');autoSave()">
+        <div id="q5preview" class="link-preview"><i class="ti ti-external-link"></i><a id="q5previewA" href="#" target="_blank" rel="noopener">Open WD Dash</a><span class="link-ok">✓ Ready</span></div>
+      </div>
+    </div>
+    <div class="att-wrap">
+      <div class="att-zone" onclick="trigFile('f5')" ondragover="onDrag(event,this)" ondragleave="offDrag(this)" ondrop="onDrop(event,'chips5',this)">
+        <div class="att-zone-row"><i class="ti ti-screenshot" style="color:var(--blue)"></i><i class="ti ti-paperclip" style="color:var(--blue)"></i><span>Attach screenshot / file</span></div>
+        <div class="att-chips" id="chips5"></div>
+      </div>
+      <input type="file" id="f5" multiple style="display:none" onchange="addFiles(this,'chips5')">
+    </div>
+  </div>
+</div>
+
+<!-- S6 HIGHLIGHTS -->
+<div class="sec" style="background:var(--pink-l);border-color:var(--pink-m)">
+  <div class="sec-hdr" onclick="tog(this)">
+    <div class="num-badge" style="background:var(--pink)">6</div>
+    <span class="sec-title" style="color:#4B1528">Highlights &amp; Concerns</span>
+    <span class="sec-tag" style="background:var(--pink-m);color:#4B1528">Trends &amp; Errors</span>
+    <i class="ti ti-chevron-down chev"></i>
+  </div>
+  <div class="sec-body">
+    <div class="pill-row">
+      <button class="pill" id="pillOk"  onclick="setPill('ok')"><i class="ti ti-circle-check"></i> All clear</button>
+      <button class="pill" id="pillMon" onclick="setPill('mon')"><i class="ti ti-alert-triangle"></i> Monitor</button>
+      <button class="pill" id="pillAct" onclick="setPill('act')"><i class="ti ti-alert-circle"></i> Action needed</button>
+    </div>
+    <div style="font-size:11px;color:var(--text-hint);margin-bottom:5px">💡 Tip: put each item on its own line — keep to 2 short lines max so it fits cleanly on the dashboard image.</div>
+    <div class="field"><span class="f-label" style="color:var(--pink)">Concerns</span><textarea class="f-textarea" id="q6con" placeholder="Trends, bot errors, anything next person needs to know..." oninput="autoSave()"></textarea></div>
+  </div>
+</div>
+
+<!-- S7 ACTION ITEMS -->
+<div class="sec" style="background:var(--green-l);border-color:var(--green-m)">
+  <div class="sec-hdr" onclick="tog(this)">
+    <div class="num-badge" style="background:var(--green)">7</div>
+    <span class="sec-title" style="color:#1B4D1E">Action Items <span id="aiCountBadge" class="ai-count" style="display:none">0</span></span>
+    <span class="sec-tag" style="background:var(--green-m);color:#1B4D1E">For Next Shift</span>
+    <i class="ti ti-chevron-down chev"></i>
+  </div>
+  <div class="sec-body">
+    <table class="ai-table">
+      <thead><tr>
+        <th style="width:36px">Done</th><th>Description</th>
+        <th style="width:100px">Priority</th><th style="width:130px">Assigned To</th>
+        <th style="width:32px"></th>
+      </tr></thead>
+      <tbody id="aiBody"></tbody>
+    </table>
+    <button class="add-row-btn" onclick="addAction()"><i class="ti ti-plus" style="font-size:15px"></i> Add action item</button>
+  </div>
+</div>
+
+<div class="bottom">
+  <button class="btn btn-teams" onclick="copyTeams()"><i class="ti ti-copy"></i> Copy Full Handover</button>
+  <button class="btn" style="background:var(--green);color:#fff" onclick="copyLoop()"><i class="ti ti-list-check"></i> Copy Loop Checklist</button>
+  <button class="btn btn-pdf"   onclick="exportPDF()"><i class="ti ti-file-type-pdf"></i> PDF</button>
+  <button class="btn btn-print" onclick="window.print()"><i class="ti ti-printer"></i> Print</button>
+  <button class="btn btn-reset" onclick="resetAll()"><i class="ti ti-refresh"></i> Reset</button>
+  <span class="hint">Auto-saves · PDF has clickable SharePoint links · Loop checklist = paste into Teams for live checkboxes</span>
+</div>
+</div>
+
+<!-- HIDDEN 1920x1080 CANVAS FOR SNAPSHOT -->
+<div id="dashCanvas" aria-hidden="true"></div>
+
+<div class="toast green" id="toast"><i class="ti ti-check"></i><span id="toastMsg">Done</span></div>
+
+<script>
+var allOpen=false,activePill='',aiCount=0,saveTimer=null,snipDataUrl=null,dashImgDataUrl=null;
+var fileNames={chips2:[],chips3:[],chips4:[],chips5:[]};
+
+window.addEventListener('load',function(){
+  document.getElementById('hdate').valueAsDate=new Date();
+  loadSaved();
+  generateDash();
+  var t=new Date();
+  document.getElementById('todayHint').textContent='Today: '+fmtDate(t.toISOString().slice(0,10));
+});
+
+function tog(hdr){var sec=hdr.closest('.sec'),body=sec.querySelector('.sec-body'),chev=hdr.querySelector('.chev');body.classList.toggle('open');chev.classList.toggle('open',body.classList.contains('open'));}
+function toggleAll(){
+  allOpen=!allOpen;
+  document.querySelectorAll('.sec-body').forEach(function(b){b.classList.toggle('open',allOpen);});
+  document.querySelectorAll('.chev').forEach(function(c){c.classList.toggle('open',allOpen);});
+  document.getElementById('expIcon').className=allOpen?'ti ti-chevrons-up':'ti ti-chevrons-down';
+  document.getElementById('expBtn').lastChild.textContent=allOpen?' Collapse all':' Expand all sections';
+}
+function setPill(p){activePill=(activePill===p)?'':p;document.getElementById('pillOk').className='pill'+(activePill==='ok'?' ok':'');document.getElementById('pillMon').className='pill'+(activePill==='mon'?' mon':'');document.getElementById('pillAct').className='pill'+(activePill==='act'?' act':'');autoSave();}
+function getStatus(){if(activePill==='act')return '🔴 Action needed';if(activePill==='mon')return '⚠️ Monitor';if(activePill==='ok')return '✅ All clear';return '';}
+function getStatusClass(){if(activePill==='act')return 'd-status-act';if(activePill==='mon')return 'd-status-mon';if(activePill==='ok')return 'd-status-ok';return 'd-status-none';}
+
+function trigFile(id){document.getElementById(id).click();}
+function onDrag(e,z){e.preventDefault();z.classList.add('drag');}
+function offDrag(z){z.classList.remove('drag');}
+function onDrop(e,cid,z){e.preventDefault();z.classList.remove('drag');renderChips([].slice.call(e.dataTransfer.files),cid);}
+function addFiles(inp,cid){renderChips([].slice.call(inp.files),cid);inp.value='';}
+function renderChips(files,cid){
+  var c=document.getElementById(cid);
+  files.forEach(function(f){fileNames[cid].push(f.name);var d=document.createElement('div');d.className='chip';d.innerHTML='<i class="ti '+(f.type.startsWith('image/')?'ti-photo':'ti-file')+'"></i><span>'+f.name+'</span><span class="rm" onclick="rmChip(this,\''+cid+'\',\''+f.name+'\')">×</span>';c.appendChild(d);});
+}
+function rmChip(el,cid,name){fileNames[cid]=fileNames[cid].filter(function(n){return n!==name;});el.closest('.chip').remove();}
+function attLine(cid){var f=fileNames[cid];return f.length?'\n   📎 '+f.join(', '):'';}
+
+function addSnip(inp){var file=inp.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){snipDataUrl=e.target.result;document.getElementById('snipImg').src=snipDataUrl;document.getElementById('snipPreview').style.display='block';document.getElementById('snipZone1').style.display='none';};reader.readAsDataURL(file);inp.value='';}
+function onDropSnip(e){e.preventDefault();document.getElementById('snipZone1').classList.remove('drag');var file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;var reader=new FileReader();reader.onload=function(ev){snipDataUrl=ev.target.result;document.getElementById('snipImg').src=snipDataUrl;document.getElementById('snipPreview').style.display='block';document.getElementById('snipZone1').style.display='none';};reader.readAsDataURL(file);}
+function removeSnip(){snipDataUrl=null;document.getElementById('snipImg').src='';document.getElementById('snipPreview').style.display='none';document.getElementById('snipZone1').style.display='block';}
+
+// Dashboard image attach/paste — used to hold the exported snapshot for the PDF report
+function showDashImg(dataUrl){dashImgDataUrl=dataUrl;document.getElementById('dashImgPreviewImg').src=dataUrl;document.getElementById('dashImgPreview').style.display='block';document.getElementById('dashImgZone').style.display='none';autoSave();}
+function addDashImg(inp){var file=inp.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){showDashImg(e.target.result);};reader.readAsDataURL(file);inp.value='';}
+function onDropDashImg(e){e.preventDefault();document.getElementById('dashImgZone').classList.remove('drag');var file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;var reader=new FileReader();reader.onload=function(ev){showDashImg(ev.target.result);};reader.readAsDataURL(file);}
+function onPasteDashImg(e){var items=(e.clipboardData||window.clipboardData).items;for(var i=0;i<items.length;i++){if(items[i].type.indexOf('image')===0){e.preventDefault();var file=items[i].getAsFile();var reader=new FileReader();reader.onload=function(ev){showDashImg(ev.target.result);};reader.readAsDataURL(file);break;}}}
+function removeDashImg(){dashImgDataUrl=null;document.getElementById('dashImgPreviewImg').src='';document.getElementById('dashImgPreview').style.display='none';document.getElementById('dashImgZone').style.display='block';autoSave();}
+
+function previewLink(inp,prev){var url=document.getElementById(inp).value.trim(),p=document.getElementById(prev),a=document.getElementById(prev+'A');if(url&&url.startsWith('http')){try{var d=decodeURIComponent(url),pt=d.split('/').pop().split('?')[0];a.textContent=pt||'Open in SharePoint';}catch(e){a.textContent='Open in SharePoint';}a.href=url;p.style.display='flex';}else{p.style.display='none';}}
+
+function v(id){var el=document.getElementById(id);return el?el.value:'';}
+function fmtDate(val){if(!val)return '—';var p=val.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:val;}
+function showToast(msg,type){type=type||'green';var t=document.getElementById('toast');document.getElementById('toastMsg').textContent=msg;t.className='toast '+type+' show';setTimeout(function(){t.classList.remove('show');},2800);}
+
+// ACTION ITEMS
+function addAction(desc,pri,assignee,done){
+  aiCount++;var id=aiCount;
+  var tbody=document.getElementById('aiBody'),tr=document.createElement('tr');
+  tr.id='ai-row-'+id;tr.className='ai-row'+(done?' done':'');
+  tr.innerHTML='<td><div class="ai-done-wrap"><input class="ai-cb" type="checkbox" id="ai-cb-'+id+'" onchange="toggleDone(this,'+id+');generateDash()" '+(done?'checked':'')+'></div></td><td><input class="ai-inp" type="text" id="ai-desc-'+id+'" placeholder="Describe the action..." value="'+(desc||'')+'" oninput="autoSave();generateDash()"></td><td><select class="ai-sel" id="ai-pri-'+id+'" onchange="styleAiSel(this);autoSave();generateDash()"><option value="">Priority</option><option value="High">🔴 High</option><option value="Medium">🟡 Medium</option><option value="Low">🟢 Low</option></select></td><td><input class="ai-tag" type="text" id="ai-ass-'+id+'" placeholder="@Assigned to" value="'+(assignee||'')+'" oninput="autoSave()"></td><td><button class="rm-row" onclick="removeAction('+id+')">×</button></td>';
+  tbody.appendChild(tr);
+  if(pri){var ps=document.getElementById('ai-pri-'+id);ps.value=pri;styleAiSel(ps);}
+  updateAiBadge();
+  var sec=document.getElementById('aiBody').closest('.sec'),body=sec.querySelector('.sec-body');
+  if(!body.classList.contains('open')){body.classList.add('open');sec.querySelector('.chev').classList.add('open');}
+  autoSave();generateDash();
+}
+function toggleDone(cb,id){document.getElementById('ai-row-'+id).classList.toggle('done',cb.checked);autoSave();}
+function styleAiSel(sel){sel.className='ai-sel';if(sel.value==='High')sel.classList.add('p-high');else if(sel.value==='Medium')sel.classList.add('p-med');else if(sel.value==='Low')sel.classList.add('p-low');}
+function removeAction(id){var r=document.getElementById('ai-row-'+id);if(r)r.remove();updateAiBadge();autoSave();generateDash();}
+function updateAiBadge(){var rows=document.querySelectorAll('#aiBody tr'),b=document.getElementById('aiCountBadge');b.textContent=rows.length;b.style.display=rows.length?'inline-flex':'none';}
+function getActions(){return [].slice.call(document.querySelectorAll('#aiBody tr')).map(function(tr){var id=tr.id.replace('ai-row-','');return{desc:v('ai-desc-'+id)||'—',pri:v('ai-pri-'+id)||'—',ass:v('ai-ass-'+id)||'—',done:document.getElementById('ai-cb-'+id)?document.getElementById('ai-cb-'+id).checked:false};});}
+function resetActions(){document.getElementById('aiBody').innerHTML='';aiCount=0;updateAiBadge();}
+
+// AUTO SAVE
+function autoSave(){clearTimeout(saveTimer);saveTimer=setTimeout(doSave,900);}
+function doSave(){
+  try{
+    var data={hdate:v('hdate'),agent:v('agent'),agentDay:v('agentDay'),q1n:v('q1n'),q1notes:v('q1notes'),q2n:v('q2n'),q2outstanding:v('q2outstanding'),q2out:v('q2out'),q3n:v('q3n'),q3tls:v('q3tls'),q3disputes:v('q3disputes'),q4pending:v('q4pending'),q4sum:v('q4sum'),q4link:v('q4link'),q5sum:v('q5sum'),q5holds:v('q5holds'),q5verify:v('q5verify'),q5link:v('q5link'),q6con:v('q6con'),pill:activePill,actions:getActions(),savedAt:new Date().toISOString()};
+    localStorage.setItem('csi_handover',JSON.stringify(data));
+    var t=new Date();document.getElementById('savedText').textContent='Saved '+t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  }catch(e){}
+}
+function loadSaved(){
+  try{
+    var raw=localStorage.getItem('csi_handover');if(!raw)return;var d=JSON.parse(raw);
+    ['hdate','agent','agentDay','q1n','q1notes','q2n','q2outstanding','q2out','q3n','q3tls','q3disputes','q4pending','q4sum','q4link','q5sum','q5holds','q5verify','q5link','q6con'].forEach(function(id){var el=document.getElementById(id);if(el&&d[id]!==undefined)el.value=d[id];});
+    if(d.q4link)previewLink('q4link','q4preview');
+    if(d.q5link)previewLink('q5link','q5preview');
+    if(d.pill){activePill='';setPill(d.pill);}
+    if(d.actions&&d.actions.length)d.actions.forEach(function(a){addAction(a.desc,a.pri!=='—'?a.pri:'',a.ass!=='—'?a.ass:'',a.done);});
+    if(d.savedAt){var t=new Date(d.savedAt);document.getElementById('savedText').textContent='Saved '+t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+  }catch(e){}
+}
+
+// GENERATE DASHBOARD (updates preview panel)
+function generateDash(){
+  var agent=v('agent')||'—',acts=getActions();
+  var done=acts.filter(function(a){return a.done;}).length;
+  var csiLink=v('q4link'),wdLink=v('q5link');
+
+  // header
+  document.getElementById('pvTitle').textContent='CSI WC — '+agent;
+  document.getElementById('pvWeek').textContent='Week ending '+fmtDate(v('hdate'));
+
+  // numbers
+  document.getElementById('pv1').textContent=v('q1n')||'0';
+  document.getElementById('pv2').textContent=v('q2n')||'0';
+  document.getElementById('pv2b').textContent=v('q2outstanding')||'0';
+  document.getElementById('pv3').textContent=v('q3n')||'0';
+  document.getElementById('pv4').textContent=v('q4pending')||'0';
+
+  // info boxes
+  document.getElementById('pvHolds').textContent=fmtDate(v('q5holds'));
+  document.getElementById('pvVerify').textContent=fmtDate(v('q5verify'));
+  document.getElementById('pvAI').textContent=acts.length?(done+'/'+acts.length+' done'):'None';
+
+  // status
+  var sEl=document.getElementById('pvStatus'),sc=getStatusClass(),st=getStatus()||'Not set';
+  sEl.innerHTML='<span class="'+sc+'">'+st+'</span>';
+
+  // highlights
+  var hEl=document.getElementById('pvHighlight'),con=v('q6con');
+  if(con){hEl.textContent=con;hEl.style.fontStyle='normal';hEl.style.opacity='0.9';}
+  else{hEl.textContent='Nothing flagged';hEl.style.fontStyle='italic';hEl.style.opacity='0.4';}
+
+  // action list in preview
+  var al=document.getElementById('pvActList');
+  if(!acts.length){al.innerHTML='<div style="font-size:11px;opacity:.35;padding:4px 0">No action items yet</div>';}
+  else{
+    al.innerHTML=acts.map(function(a){
+      var pri=a.pri==='High'?'🔴':a.pri==='Medium'?'🟡':a.pri==='Low'?'🟢':'⚪';
+      var tick=a.done?'<div class="prev-act-tick" style="background:#2E7D32;color:#fff;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0">✓</div>':'<div class="prev-act-tick" style="background:rgba(255,255,255,0.15);width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>';
+      return '<div class="prev-act-item">'+tick+'<span style="font-size:11px;'+(a.done?'text-decoration:line-through;opacity:.5':'')+';flex:1">'+a.desc+'</span><span style="font-size:10px;opacity:.6">'+pri+(a.ass&&a.ass!=='—'?' · '+a.ass:'')+'</span></div>';
+    }).join('');
+  }
+
+  // links
+  var csiEl=document.getElementById('pvCsiLink'),wdEl=document.getElementById('pvWdLink'),noEl=document.getElementById('pvNoLinks');
+  if(csiLink){csiEl.href=csiLink;csiEl.style.display='inline-flex';}else{csiEl.style.display='none';}
+  if(wdLink){wdEl.href=wdLink;wdEl.style.display='inline-flex';}else{wdEl.style.display='none';}
+  noEl.style.display=(csiLink||wdLink)?'none':'inline';
+}
+
+// SNAPSHOT — 800×360 base, scale:3 → 2400×1080 output, dark navy bg, pastel cards
+function snapDash(){
+  generateDash();
+  showToast('Building dashboard image…','amber');
+  var agent=v('agent')||'—', acts=getActions();
+  var done=acts.filter(function(a){return a.done;}).length;
+  var openCount=acts.filter(function(a){return !a.done;}).length;
+  var st=getStatus()||'Not set';
+
+  var cv=document.getElementById('dashCanvas');
+  cv.innerHTML='';
+
+  // ── header ──
+  var hd=document.createElement('div');
+  hd.style.cssText='display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:15px';
+  var agentDay=v('agentDay')||'';
+  hd.innerHTML=
+    '<div>'+
+      '<div style="font-size:20px;font-weight:900;letter-spacing:-.5px;line-height:1;color:#fff">CSI WC Weekly Handover'+(agentDay?' <span style="color:#7FE0C8">— '+agentDay+'</span>':'')+'</div>'+
+    '</div>'+
+    '<div style="text-align:right">'+
+      '<div style="font-size:13px;color:#fff"><span style="opacity:.5;text-transform:uppercase;letter-spacing:.6px;font-size:10.5px">Week ending</span> <span style="font-weight:700;color:#AFA9EC;font-size:14.5px">'+fmtDate(v('hdate'))+'</span></div>'+
+    '</div>';
+  cv.appendChild(hd);
+
+  // ── 5 number cards (pastel fill + bold border + dark accent number) ──
+  var nums=[
+    {bg:'#EEEDFE',border:'#534AB7',lc:'#3C3489',vc:'#534AB7',label:'📬 CSI QUEUE',   val:v('q1n')||'0',       sub:'after Direct'},
+    {bg:'#E1F5EE',border:'#0F6E56',lc:'#085041',vc:'#0F6E56',label:'📋 TRACKER',     val:v('q2n')||'0',       sub:'remaining'},
+    {bg:'#EAF3DE',border:'#3B6D11',lc:'#27500A',vc:'#3B6D11',label:'⚠️ OVERDUE',     val:v('q2outstanding')||'0',sub:'disputes'},
+    {bg:'#FAEEDA',border:'#854F0B',lc:'#633806',vc:'#854F0B',label:'📥 INBOX',       val:v('q3n')||'0',       sub:'remaining'},
+    {bg:'#FAECE7',border:'#993C1D',lc:'#4A1B0C',vc:'#993C1D',label:'📊 CSI DASH',   val:v('q4pending')||'0', sub:'pending'},
+  ];
+  var nr=document.createElement('div');
+  nr.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px';
+  nums.forEach(function(n){
+    var card=document.createElement('div');
+    card.style.cssText='background:'+n.bg+';border:2px solid '+n.border+';border-radius:8px;text-align:center;padding:11px 4px 9px';
+    card.innerHTML=
+      '<div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:'+n.lc+';margin-bottom:5px;white-space:nowrap">'+n.label+'</div>'+
+      '<div style="font-size:44px;font-weight:900;line-height:1;letter-spacing:-1px;color:'+n.vc+'">'+n.val+'</div>'+
+      '<div style="font-size:15px;margin-top:4px;color:'+n.lc+';opacity:.65">'+n.sub+'</div>';
+    nr.appendChild(card);
+  });
+  cv.appendChild(nr);
+
+  // ── info row: status | actions | holds | verify ──
+  var infoColors=[
+    {bg:'#FBEAF0',border:'#ED93B1',lc:'#993556',label:'🚦 STATUS',     val:st},
+    {bg:'#E6F1FB',border:'#85B7EB',lc:'#185FA5',label:'✅ ACTIONS',    val:(openCount)+' open'},
+    {bg:'#E1F5EE',border:'#5DCAA5',lc:'#085041',label:'🗓 HOLDS CLEARED', val:fmtDate(v('q5holds'))},
+    {bg:'#FAEEDA',border:'#EF9F27',lc:'#633806',label:'✅ VERIFICATION', val:fmtDate(v('q5verify'))},
+  ];
+  var ir=document.createElement('div');
+  ir.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px';
+  infoColors.forEach(function(info){
+    var b=document.createElement('div');
+    b.style.cssText='background:'+info.bg+';border:2px solid '+info.border+';border-radius:8px;padding:11px 10px;display:flex;flex-direction:column;justify-content:center;min-height:46px';
+    b.innerHTML=
+      '<div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:'+info.lc+';opacity:.7;margin-bottom:4px;white-space:nowrap">'+info.label+'</div>'+
+      '<div style="font-size:21px;font-weight:700;color:'+info.lc+'">'+info.val+'</div>';
+    ir.appendChild(b);
+  });
+  cv.appendChild(ir);
+
+  // ── highlights + agent bottom row ──
+  var bot=document.createElement('div');
+  bot.style.cssText='display:grid;grid-template-columns:3fr 1fr;gap:6px';
+  var con=v('q6con')||'Nothing flagged';
+  var conLines=con.split(/\n+/).map(function(s){return s.trim();}).filter(Boolean);
+  if(conLines.length===0)conLines=[con];
+  var conHtml='<div style="font-size:14.5px;color:#4B1528;line-height:1.4;opacity:'+(v('q6con')?'1':'.45')+';font-style:'+(v('q6con')?'normal':'italic')+'">'+conLines.join(' &nbsp;•&nbsp; ')+'</div>';
+  var hl=document.createElement('div');
+  hl.style.cssText='background:#FBEAF0;border:2px solid #ED93B1;border-radius:8px;padding:13px 16px;display:flex;flex-direction:column;justify-content:center;min-height:48px';
+  hl.innerHTML=
+    '<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#993556;opacity:.7;margin-bottom:5px">🔦 HIGHLIGHTS / CONCERNS</div>'+
+    conHtml;
+  bot.appendChild(hl);
+
+  // branding corner
+  var br=document.createElement('div');
+  br.style.cssText='background:#EEEDFE;border:2px solid #534AB7;border-radius:8px;padding:13px 10px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:48px';
+  br.innerHTML=
+    '<div style="font-family:\'Tangerine\',cursive;font-weight:700;font-size:36px;color:#534AB7;line-height:1">'+agent+'</div>'+
+    '<div style="font-size:9.5px;color:#3C3489;font-weight:700;letter-spacing:.5px;margin-top:3px">CSI AGENT</div>';
+  bot.appendChild(br);
+  cv.appendChild(bot);
+
+  // ── capture at scale 3 (wait for Tangerine webfont to be ready first) ──
+  function doCapture(){
+    html2canvas(cv,{scale:3,useCORS:true,backgroundColor:null,width:800,height:360,logging:false}).then(function(canvas){
+      canvas.toBlob(function(blob){
+        if(navigator.clipboard&&navigator.clipboard.write){
+          try{
+            navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(function(){
+              showToast('📸 Copied — paste into Teams!','green');
+              var n=document.getElementById('snapNote');
+              n.textContent='📸 Dashboard copied to clipboard — paste straight into your Teams message!';
+              n.classList.add('show');setTimeout(function(){n.classList.remove('show');},6000);
+            }).catch(function(){dlCanvas(canvas);});
+          }catch(e){dlCanvas(canvas);}
+        }else{dlCanvas(canvas);}
+      },'image/png');
+    }).catch(function(err){console.error(err);showToast('Snapshot failed — try Chrome','red');});
+  }
+  if(document.fonts&&document.fonts.ready){
+    Promise.all([
+      document.fonts.load('700 50px Tangerine'),
+      document.fonts.ready
+    ]).then(function(){setTimeout(doCapture,80);}).catch(function(){setTimeout(doCapture,150);});
+  }else{
+    setTimeout(doCapture,150);
+  }
+}
+
+function dlCanvas(canvas){
+  var link=document.createElement('a');link.download='CSI_WC_Dashboard.png';link.href=canvas.toDataURL('image/png');link.click();
+  showToast('📸 Image downloaded — attach in Teams!','green');
+  var n=document.getElementById('snapNote');n.textContent='📸 Downloaded! Attach the PNG file in your Teams message.';n.classList.add('show');setTimeout(function(){n.classList.remove('show');},6000);
+}
+
+// COPY CHECKLIST (Option B — re-pasteable text checklist)
+function copyChecklist(){
+  var acts=getActions();
+  if(!acts.length){showToast('No action items to copy','amber');return;}
+  var date=fmtDate(v('hdate')),agent=v('agent')||'—';
+  var lines=[
+    '📌 **ACTION ITEMS — CSI WC Week ending '+date+'**',
+    '👤 '+agent,
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '',
+  ];
+  acts.forEach(function(a,i){
+    var tick=a.done?'✅':'⬜';
+    var pri=a.pri==='High'?'🔴 High':a.pri==='Medium'?'🟡 Medium':a.pri==='Low'?'🟢 Low':'—';
+    var ass=(a.ass&&a.ass!=='—')?'  👤 '+a.ass:'';
+    lines.push(tick+' **'+a.desc+'**');
+    lines.push('   '+pri+ass);
+    lines.push('');
+  });
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  lines.push('_Tick off items as they are completed and re-paste this list_');
+  navigator.clipboard.writeText(lines.join('\n')).then(function(){showToast('Checklist copied!','green');}).catch(function(){showToast('Copy failed','red');});
+}
+
+// COPY LOOP CHECKLIST (Option B — Microsoft Loop format for Teams)
+function copyLoop(){
+  var acts=getActions();
+  if(!acts.length){showToast('No action items to copy','amber');return;}
+  var date=fmtDate(v('hdate')),agent=v('agent')||'—';
+  var lines=[
+    '**📌 Action Items — CSI WC Week ending '+date+'**',
+    '👤 '+agent,
+    '',
+  ];
+  acts.forEach(function(a){
+    var pri=a.pri==='High'?'🔴':a.pri==='Medium'?'🟡':a.pri==='Low'?'🟢':'';
+    var ass=(a.ass&&a.ass!=='—')?'  👤 '+a.ass:'';
+    // Loop checklist format — [ ] becomes interactive checkbox when pasted into Teams
+    lines.push((a.done?'[x]':'[ ]')+' '+a.desc+(pri?' '+pri:'')+ass);
+  });
+  lines.push('');
+  lines.push('_Paste into Teams as a Loop component to get live interactive checkboxes_');
+  navigator.clipboard.writeText(lines.join('\n'))
+    .then(function(){showToast('Loop checklist copied — paste into Teams!','green');})
+    .catch(function(){showToast('Copy failed','red');});
+}
+
+
+// COPY DASHBOARD TEXT
+function copyDashboard(){
+  generateDash();
+  var lines=[
+    '╔═══════════════════════════════════════╗',
+    '║  📊  CSI WC — '+(v('agent')||'—'),
+    '║  Week ending '+fmtDate(v('hdate')),
+    '╚═══════════════════════════════════════╝','',
+    '┌──────────┬──────────┬──────────┬──────────┬──────────┐',
+    '│ 📬 QUEUE │ 📋 TRKR  │ ⚠️ OUT   │ 📥 INBOX │ 📊 PEND  │',
+    '│   **'+(v('q1n')||'0')+'**      │   **'+(v('q2n')||'0')+'**      │   **'+(v('q2outstanding')||'0')+'**      │   **'+(v('q3n')||'0')+'**      │   **'+(v('q4pending')||'0')+'**      │',
+    '└──────────┴──────────┴──────────┴──────────┴──────────┘','',
+    '🚦 **Status:** '+(getStatus()||'Not set'),
+    '✅ **Actions:** '+(acts.length?(done+'/'+acts.length+' complete'):'None logged'),
+    v('q5holds')?'🗓 **WD Holds cleared:** '+fmtDate(v('q5holds')):'',
+    v('q5verify')?'✅ **WD Verification:** '+fmtDate(v('q5verify')):'',
+    '',
+  ];
+  if(open.length){lines.push('📌 **Open Actions:**');open.forEach(function(a){var pri=a.pri==='High'?'🔴':a.pri==='Medium'?'🟡':a.pri==='Low'?'🟢':'⚪';lines.push('   ⬜ '+a.desc+'  '+pri+(a.ass&&a.ass!=='—'?'  👤 '+a.ass:''));});lines.push('');}
+  if(v('q6con')){lines.push('🔦 **Highlights:** '+v('q6con'));lines.push('');}
+  if(v('q4link'))lines.push('🔗 **CSI Dash:** '+v('q4link'));
+  if(v('q5link'))lines.push('🔗 **WD Dash:** '+v('q5link'));
+  lines.push('','━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','👉 Full handover details follow below ↓');
+  navigator.clipboard.writeText(lines.filter(function(l){return l!=null;}).join('\n')).then(function(){showToast('Dashboard text copied!','blue');}).catch(function(){showToast('Copy failed','red');});
+}
+
+// COPY FULL HANDOVER
+function copyTeams(){
+  var date=fmtDate(v('hdate')),agent=v('agent')||'—',acts=getActions();
+  var actLines=acts.length?acts.map(function(a){var tick=a.done?'✅':'⬜',pri=a.pri==='High'?'🔴 High':a.pri==='Medium'?'🟡 Medium':a.pri==='Low'?'🟢 Low':'—',ass=(a.ass&&a.ass!=='—')?'  👤 '+a.ass:'';return '   '+tick+' **'+a.desc+'**  |  '+pri+ass;}):['   None logged'];
+  var lines=[
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '📋  **CSI WC WEEKLY HANDOVER REPORT**',
+    '📅  Week ending '+date+'   👤  '+agent,
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','',
+    '**1️⃣ CSI QUEUE — WC Queue**',
+    '> 🔢 Remaining after Direct cleared:  **'+(v('q1n')||'0')+'**',
+    v('q1notes')?'> 📝 '+v('q1notes'):'',
+    snipDataUrl?'> 📸 *(CSI Queue snip attached)*':'','',
+    '**2️⃣ CSI TRACKER**',
+    '> 🔢 Remaining:  **'+(v('q2n')||'0')+'**',
+    '> ⚠️ Overdue:  **'+(v('q2outstanding')||'0')+'**',
+    v('q2out')?'> 📝 '+v('q2out'):'','',
+    '**3️⃣ CSI INBOX**',
+    '> 🔢 Remaining:  **'+(v('q3n')||'0')+'**',
+    v('q3tls')?'> 🏷️ '+v('q3tls'):'> 🏷️ Tags: None',
+    v('q3disputes')?'> ⚠️ '+v('q3disputes'):'> ⚠️ Disputes: None','',
+    '**4️⃣ CSI DASH**',
+    '> 🔢 Pending:  **'+(v('q4pending')||'0')+'**',
+    v('q4sum')?'> 📊 '+v('q4sum'):'> 📊 No updates',
+    v('q4link')?'> 🔗 [Open CSI Dash]('+v('q4link')+')':'','',
+    '**5️⃣ WASTE DIGITAL DASH**',
+    v('q5sum')?'> 📊 '+v('q5sum'):'> 📊 No updates',
+    v('q5holds')?'> 🗓 Holds cleared up to:  **'+fmtDate(v('q5holds'))+'**':'',
+    v('q5verify')?'> ✅ Verification up to:  **'+fmtDate(v('q5verify'))+'**':'',
+    v('q5link')?'> 🔗 [Open WD Dash]('+v('q5link')+')':'','',
+    '**6️⃣ HIGHLIGHTS & CONCERNS**',
+    '> 🚦 '+(getStatus()||'Not set'),
+    v('q6con')?'> 🔦 '+v('q6con'):'> ✅ Nothing to flag','',
+    '**7️⃣ ACTION ITEMS**',
+  ].concat(actLines).concat(['','━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','📌 **Handover complete** — tag incoming shift for acknowledgement']);
+  navigator.clipboard.writeText(lines.filter(function(l){return l!=null&&l!=='';}).join('\n')).then(function(){showToast('Copied!','green');}).catch(function(){showToast('Copy failed','red');});
+}
+
+// PDF WITH CLICKABLE LINKS
+function exportPDF(){
+  generateDash();
+  var date=fmtDate(v('hdate')),agent=v('agent')||'—',agentDay=v('agentDay')||'';
+  var acts=getActions();
+  var statusTxt=getStatus()||'Not set';
+  var concernsRaw=v('q6con');
+  var concernsTxt=concernsRaw?concernsRaw.split(/\n+/).map(function(s){return s.trim();}).filter(Boolean).join(' • '):'Nothing to flag';
+  function esc(str){return (str==null?'':String(str)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function row(label,val,color){return '<div class="pr-card-row"><span class="pr-row-label" style="color:'+color+'">'+esc(label)+'</span><span class="pr-row-val">'+esc(val||'—')+'</span></div>';}
+  function rowLink(label,url,color){
+    return '<div class="pr-card-row"><span class="pr-row-label" style="color:'+color+'">'+esc(label)+'</span><span class="pr-row-val">'+
+      (url?('<a href="'+esc(url)+'" target="_blank" rel="noopener" style="color:#185FA5;text-decoration:underline">Open in SharePoint</a>'):'<span style="color:#999">No link provided</span>')+
+      '</span></div>';
+  }
+  function rowSplit(l1,v1,l2,v2,color){
+    return '<div class="pr-card-row-split">'+
+      '<span class="pr-split-pair"><span class="pr-row-label" style="color:'+color+'">'+esc(l1)+'</span><span class="pr-row-val">'+esc(v1||'—')+'</span></span>'+
+      '<span class="pr-split-pair"><span class="pr-row-label" style="color:'+color+'">'+esc(l2)+'</span><span class="pr-row-val">'+esc(v2||'—')+'</span></span>'+
+    '</div>';
+  }
+  var actionsHtml = acts.length ? acts.map(function(a){
+    return row((a.done?'✓':'○')+' '+(a.pri||'—'), a.desc+(a.ass&&a.ass!=='—'?' → '+a.ass:''), '#2E7D32');
+  }).join('') : row('Actions','None logged','#2E7D32');
+
+  var dashImgHtml = dashImgDataUrl
+    ? '<img src="'+dashImgDataUrl+'" alt="Dashboard snapshot" class="pr-dash-img">'
+    : '<div class="pr-dash-img-slot">PASTE DASHBOARD IMAGE HERE</div>';
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CSI WC Handover — '+esc(date)+'</title><style>'+
+  '*{box-sizing:border-box}'+
+  'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;margin:0;padding:0;color:#1a1a1a;background:#fff}'+
+  '.pr-page{max-width:850px;margin:0 auto}'+
+  '@page{size:A4;margin:0}'+
+  '@media print{html,body{background:#fff;padding:0;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.pr-page{max-width:none;width:100%}}'+
+  '.pr-hdr{background:#534AB7;color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}'+
+  '.pr-hdr h1{margin:0;font-size:15px;font-weight:900;white-space:nowrap}'+
+  '.pr-hdr .pr-meta{font-size:11.5px;opacity:.85;display:flex;gap:18px;white-space:nowrap}'+
+  '.pr-body{padding:10px 28px 24px}'+
+  '.pr-dash-img-slot{width:85%;margin:0 auto 14px;aspect-ratio:800/360;border-radius:10px;border:2px dashed #AFA9EC;background:#EEEDFE;display:flex;align-items:center;justify-content:center;color:#534AB7;font-weight:700;font-size:13px}'+
+  '.pr-dash-img{width:85%;display:block;margin:0 auto 14px;border-radius:10px;border:2px solid #534AB7}'+
+  '.pr-sections{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}'+
+  '.pr-card{border-radius:10px;padding:11px 14px;border:1.5px solid}'+
+  '.pr-card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:7px}'+
+  '.pr-card-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;flex-shrink:0}'+
+  '.pr-card-title{font-size:14px;font-weight:800}'+
+  '.pr-card-tag{font-size:10.5px;opacity:.7;margin-left:auto;font-weight:600}'+
+  '.pr-card-row{display:flex;justify-content:space-between;gap:10px;padding:4.5px 0;font-size:12.5px;border-top:1px solid rgba(0,0,0,0.06)}'+
+  '.pr-card-row:first-of-type{border-top:none}'+
+  '.pr-row-label{font-weight:700;opacity:.75;white-space:nowrap}'+
+  '.pr-row-val{text-align:right;color:#1a1a1a;word-break:break-word}'+
+  '.pr-card-row-split{display:flex;gap:14px;padding:4.5px 0;font-size:12.5px;border-top:1px solid rgba(0,0,0,0.06)}'+
+  '.pr-card-row-split:first-of-type{border-top:none}'+
+  '.pr-split-pair{display:flex;flex:1;justify-content:space-between;gap:6px;min-width:0}'+
+  '.pr-split-pair .pr-row-label{white-space:nowrap}'+
+  '.pr-split-pair .pr-row-val{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'+
+  '.pr-full-card{grid-column:1/-1}'+
+  '</style></head><body>'+
+  '<div class="pr-page">'+
+    '<div class="pr-hdr">'+
+      '<h1>CSI WC WEEKLY HANDOVER REPORT</h1>'+
+      '<div class="pr-meta"><span>Week ending '+esc(date)+(agentDay?' — '+esc(agentDay):'')+'</span><span>Agent: '+esc(agent)+'</span></div>'+
+    '</div>'+
+    '<div class="pr-body">'+
+      dashImgHtml+
+      '<div class="pr-sections">'+
+        '<div class="pr-card" style="background:#EEEDFE;border-color:#AFA9EC">'+
+          '<div class="pr-card-hdr"><div class="pr-card-num" style="background:#534AB7">1</div><div class="pr-card-title" style="color:#3C3489">CSI Queue</div><div class="pr-card-tag" style="color:#3C3489">WC Queue</div></div>'+
+          row('Remaining',v('q1n')||'0','#534AB7')+row('Notes',v('q1notes'),'#534AB7')+
+        '</div>'+
+        '<div class="pr-card" style="background:#E1F5EE;border-color:#5DCAA5">'+
+          '<div class="pr-card-hdr"><div class="pr-card-num" style="background:#0F6E56">2</div><div class="pr-card-title" style="color:#085041">CSI Tracker</div><div class="pr-card-tag" style="color:#085041">Disputes</div></div>'+
+          rowSplit('Remaining',v('q2n')||'0','Overdue',v('q2outstanding')||'0','#0F6E56')+row('Details',v('q2out')||'None','#0F6E56')+
+        '</div>'+
+        '<div class="pr-card" style="background:#FAEEDA;border-color:#EF9F27">'+
+          '<div class="pr-card-hdr"><div class="pr-card-num" style="background:#854F0B">3</div><div class="pr-card-title" style="color:#633806">CSI Inbox</div><div class="pr-card-tag" style="color:#633806">Escalations</div></div>'+
+          row('Remaining',v('q3n')||'0','#854F0B')+row('Tags',v('q3tls')||'None','#854F0B')+row('Disputes',v('q3disputes')||'None','#854F0B')+
+        '</div>'+
+        '<div class="pr-card" style="background:#FAECE7;border-color:#F0997B">'+
+          '<div class="pr-card-hdr"><div class="pr-card-num" style="background:#993C1D">4</div><div class="pr-card-title" style="color:#4A1B0C">CSI Dash</div><div class="pr-card-tag" style="color:#4A1B0C">Visibility</div></div>'+
+          row('Pending',v('q4pending')||'0','#993C1D')+row('Summary',v('q4sum')||'No updates','#993C1D')+rowLink('SharePoint',v('q4link'),'#993C1D')+
+        '</div>'+
+        '<div class="pr-card" style="background:#E6F1FB;border-color:#85B7EB">'+
+          '<div class="pr-card-hdr"><div class="pr-card-num" style="background:#185FA5">5</div><div class="pr-card-title" style="color:#042C53">WD Dash</div><div class="pr-card-tag" style="color:#042C53">Visibility</div></div>'+
+          row('Summary',v('q5sum')||'No updates','#185FA5')+rowSplit('Holds cleared',fmtDate(v('q5holds')),'Verification',fmtDate(v('q5verify')),'#185FA5')+rowLink('SharePoint',v('q5link'),'#185FA5')+
+        '</div>'+
+        '<div class="pr-card" style="background:#FBEAF0;border-color:#ED93B1">'+
+          '<div class="pr-card-hdr"><div class="pr-card-num" style="background:#993556">6</div><div class="pr-card-title" style="color:#4B1528">Highlights</div><div class="pr-card-tag" style="color:#4B1528">Trends &amp; Errors</div></div>'+
+          row('Status',statusTxt,'#993556')+row('Concerns',concernsTxt,'#993556')+
+        '</div>'+
+        '<div class="pr-card pr-full-card" style="background:#EAF3DE;border-color:#97C459">'+
+          '<div class="pr-card-hdr"><div class="pr-card-num" style="background:#2E7D32">7</div><div class="pr-card-title" style="color:#1B4D1E">Action Items</div><div class="pr-card-tag" style="color:#1B4D1E">For Next Shift</div></div>'+
+          actionsHtml+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>'+
+  '<script>window.onload=function(){setTimeout(function(){window.print();},250);};<\/script>'+
+  '</body></html>';
+
+  var win = window.open('', '_blank');
+  if(!win){showToast('Pop-up blocked — allow pop-ups to export the PDF','red');return;}
+  win.document.open();win.document.write(html);win.document.close();
+  showToast('Opening print preview…','green');
+}
+
+// RESET
+function resetAll(){
+  if(!confirm('Reset all fields? Saved data will be cleared.'))return;
+  ['hdate','agent','agentDay','q1n','q1notes','q2n','q2outstanding','q2out','q3n','q3tls','q3disputes','q4pending','q4sum','q4link','q5sum','q5holds','q5verify','q5link','q6con'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('hdate').valueAsDate=new Date();
+  ['q4preview','q5preview'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});
+  Object.keys(fileNames).forEach(function(k){fileNames[k]=[];var el=document.getElementById(k);if(el)el.innerHTML='';});
+  removeSnip();removeDashImg();activePill='';setPill('');resetActions();
+  if(allOpen)toggleAll();
+  localStorage.removeItem('csi_handover');
+  document.getElementById('savedText').textContent='Not saved';
+  generateDash();
+}
+</script>
+</body>
+</html>

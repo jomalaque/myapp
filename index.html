@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CSI Productivity Dashboard</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #F4F4F7;
+    color: #2B2B2B;
+  }
+
+  header {
+    background-color: #2E2A6B;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+  }
+
+  nav {
+    background-color: white;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    border-bottom: 2px solid #3C3A8F;
+  }
+
+  nav a {
+    text-decoration: none;
+    color: #2F6FDB;
+    font-weight: bold;
+  }
+
+  .container {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .card {
+    display: inline-block;
+    background: white;
+    padding: 20px;
+    margin: 15px;
+    border-radius: 12px;
+    width: 260px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  }
+
+  .error { background-color: #CDEEDF; }
+  .handover { background-color: #F3E1C9; }
+  .resources { background-color: #C9CFF5; }
+
+  h3 {
+    margin-top: 10px;
+  }
+
+  button {
+    margin-top: 15px;
+    padding: 10px 15px;
+    border: none;
+    background-color: #5A4FCF;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #3C3A8F;
+  }
+</style>
+
+</head>
+
+<body>
+
+<header>
+  CSI Productivity Dashboard 🚀
+</header>
+
+<nav>
+  Home
+  error.htmlError Tracker</a>
+  handover.htmlHandover Generator</a>
+  resources.htmlResources</a>
+</nav>
+
+<div class="container">
+
+  <div class="card error">
+    <h3>Error Tracker</h3>
+    <p>Log, track, and monitor issues quickly.</p>
+    <button onclick="alert('Opening Error Tracker...')">Open</button>
+  </div>
+
+  <div class="card handover">
+    <h3>Handover Generator</h3>
+    <p>Create structured handover notes instantly.</p>
+    <button onclick="alert('Opening Handover Tool...')">Open</button>
+  </div>
+
+  <div class="card resources">
+    <h3>Resources</h3>
+    <p>Access guides, policies, and references.</p>
+    <button onclick="alert('Opening Resources...')">Open</button>
+  </div>
+
+</div>
+
+</body>
+</html>
